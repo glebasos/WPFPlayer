@@ -14,8 +14,8 @@ namespace PlayerTest
 {
     class LastFM
     {
-        private string ApiKey = "d25575d1bdc5630d0a0ca2d0cfa4d336";
-        private string mySecret = "5c4106c862eaead223d37d0aad86538f";
+        private string ApiKey = "";
+        private string mySecret = "";
 		private string sessionKey;
 		private static readonly HttpClient client = new HttpClient();
 
