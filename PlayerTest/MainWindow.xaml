@@ -369,6 +369,7 @@
             <MenuItem Header="File">
                 <MenuItem Command="ApplicationCommands.Open"/>
             </MenuItem>
+            <MenuItem x:Name="btnTopConnectLastFM" Header="LastFM" Click="btnTopConnectLastFM_Click"/>
         </Menu>
 
         <Border  DockPanel.Dock="Bottom" VerticalAlignment="Bottom" BorderBrush="#FF464545" BorderThickness="1">

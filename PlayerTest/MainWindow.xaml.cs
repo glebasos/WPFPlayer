@@ -36,6 +36,12 @@ namespace PlayerTest
             InitializeComponent();
             
             UpdateTimeSeekAsync();
+
+            if (File.Exists("session.txt"))
+            {
+                player.SetLastFMSession();
+                btnTopConnectLastFM.IsEnabled = false;
+            }
             //Thread thread = new System.Threading.Thread(new System.Threading.ThreadStart(OnPlaying));
             //thread.Start();
         }
@@ -75,6 +81,10 @@ namespace PlayerTest
                     }
                     
                     progress.Report(ms);
+                    if(player.audioFile.CurrentTime.TotalMilliseconds / player.audioFile.TotalTime.TotalMilliseconds > 0.5 && !player.IsScrobbled && player.audioFile.TotalTime.TotalMilliseconds>30000)
+                    {
+                        player.ScrobbleToLastAsync();
+                    }
                     //sliderTimeSeek.Value = (ms / player.audioFile.TotalTime.TotalMilliseconds) * 100;
                     //MessageBox.Show("Testlol");
                     //Console.WriteLine("Milliseconds Played: " + ms);
@@ -387,6 +397,11 @@ namespace PlayerTest
         private void sliderTimeSeek_MouseLeave(object sender, MouseEventArgs e)
         {
             isMouseOverTS = false;
+        }
+
+        private void btnTopConnectLastFM_Click(object sender, RoutedEventArgs e)
+        {
+            player.ConnectToLast();
         }
 
         //private void btnMute_Click(object sender, MouseButtonEventArgs e)

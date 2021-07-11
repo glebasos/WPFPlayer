@@ -5,7 +5,7 @@ using System.Text;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System.Linq;
-
+using System.Threading.Tasks;
 
 namespace PlayerTest
 {
@@ -16,19 +16,39 @@ namespace PlayerTest
         private float Volume { get; set; } = 0f;
         public bool Muted { get; set; } = false;
         public bool IsPlaying { get; set; } = false;
+        public bool IsScrobbled { get; set; } = false;
         public WaveOutEvent outputDevice;
         public AudioFileReader audioFile;
+        private LastFM lastfm;
         public Player()
         {
             outputDevice = new WaveOutEvent();
             outputDevice.Volume = 0.5f;
             //outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+            lastfm = new LastFM();
+        }
+
+        public void ScrobbleToLastAsync()
+        {
+            //await Task.Run(() => RunScrobbleProcess());
+            RunScrobbleProcess();
+        }
+        private void RunScrobbleProcess()
+        {
+            //lastfm.GetSession();
+            lastfm.NewScrobble(currentTrack.TrackName, currentTrack.ArtistName, currentTrack.AlbumName);
+            IsScrobbled = true;
+        }
+        public void ConnectToLast()
+        {
+            lastfm.GetSession();
         }
         public void Load(string trackpath)
         {
             //Honestly, every track change should be made by Load(newTrack), but... In Xamarin release maybe
             //So, expect to get null pointers after deleting tracks from folder lol
             Stop();
+            IsScrobbled = false;
             currentTrack = new Track(trackpath);
             currentFolder.ClearAllTracks();
             currentFolder.Path = Path.GetDirectoryName(trackpath);
@@ -101,6 +121,7 @@ namespace PlayerTest
         {
             Stop();
             //произошел диспоуз
+            IsScrobbled = false;
             var nextTrack = currentFolder.Tracks.SkipWhile(t => t.Path!=currentTrack.Path).Skip(1).FirstOrDefault();
             if (nextTrack == null)
             {
@@ -120,6 +141,7 @@ namespace PlayerTest
         public void PreviousTrack()
         {
             Stop();
+            IsScrobbled = false;
             currentFolder.Tracks.Reverse();
             var previousTrack = currentFolder.Tracks.SkipWhile(t => t.Path != currentTrack.Path).Skip(1).FirstOrDefault();
             currentFolder.Tracks.Reverse();
@@ -174,6 +196,12 @@ namespace PlayerTest
             }
        
             
+        }
+
+        public void SetLastFMSession()
+        {
+            string s = File.ReadAllText("session.txt");
+            lastfm.SetSession(s);
         }
     }
 }
